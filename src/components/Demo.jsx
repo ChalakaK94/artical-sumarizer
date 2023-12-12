@@ -1,6 +1,6 @@
 
 import {copy,linkIcon,tick,loader} from '../assets'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useLazyGetSummaryQuery} from "../services/article.js";
 export function Demo() {
 
@@ -9,15 +9,28 @@ export function Demo() {
         summary: ''
     })
 
+    const [allArticles, setAllArticles] = useState([])
+
     const [ getSummary, {error, isFetching}] = useLazyGetSummaryQuery();
+
+    useEffect(() => {
+        const articleFromLocalStorage = JSON.parse(localStorage.getItem('articles'))
+
+        if(articleFromLocalStorage){
+            setAllArticles(articleFromLocalStorage)
+        }
+    }, []);
 
     const handleSubmit = async (e) =>{
         e.preventDefault();
         const {data} = await getSummary({ articleUrl: article.url })
         if (data?.summary) {
             const newArticle = { ...article, summary: data.summary };
+            const updatedAllArticles = [newArticle,  ...allArticles];
+            setAllArticles(updatedAllArticles)
             setArticle(newArticle);
-            console.log(newArticle );
+
+            localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
         }
 
 
@@ -32,6 +45,9 @@ export function Demo() {
                     <button type='submit' className='submit_btn peer-focus: border-gray-700 peer-focus:text-gray-700'>Submit</button>
                 </form>
 
+                <div>
+
+                </div>
             </div>
 
         </section>
