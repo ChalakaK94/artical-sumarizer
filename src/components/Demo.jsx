@@ -10,6 +10,7 @@ export function Demo() {
     })
 
     const [allArticles, setAllArticles] = useState([])
+    const [copyUrl, setCopyUrl] = useState()
 
     const [ getSummary, {error, isFetching}] = useLazyGetSummaryQuery();
 
@@ -32,8 +33,15 @@ export function Demo() {
 
             localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
         }
+    }
 
-
+    const handleCopy = (copy) =>{
+        setCopyUrl(copy)
+        navigator.clipboard.writeText(copy);
+        setTimeout(()=>{
+            setCopyUrl(false)
+        },2000)
+        
     }
     return (
         <section className='mt-16 w-full max-w-xl'>
@@ -49,7 +57,7 @@ export function Demo() {
                     {allArticles.map((item,index)=>(
                         <div key={`link-${index}`} onClick={()=>setArticle(item)} className='link_card'>
                             <div className='copy_btn'>
-                                <img src={copy} alt=" " className='w-[40%] h-[40%] object-contain' />
+                                <img src={copyUrl === item.url ? tick : copy } alt=" " onClick={()=>handleCopy(item.url) } className='w-[40%] h-[40%] object-contain' />
                             </div>
                             <p className='flex-1 font-satoshi text-blue-700 font-medium text-sm truncate'>{item.url}</p>
                         </div>
